@@ -16,8 +16,9 @@ namespace Order.API.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Amount = table.Column<decimal>(type: "TEXT", nullable: false),
-                    Currency = table.Column<string>(type: "TEXT", nullable: true),
+                    Price = table.Column<decimal>(type: "TEXT", nullable: false),
+                    Prudoct = table.Column<string>(type: "TEXT", nullable: true),
+                    CustomerFullName = table.Column<string>(type: "TEXT", nullable: true),
                     CustomerEmail = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>

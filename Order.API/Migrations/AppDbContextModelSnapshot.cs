@@ -23,13 +23,16 @@ namespace Order.API.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Currency")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("CustomerEmail")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CustomerFullName")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Prudoct")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");

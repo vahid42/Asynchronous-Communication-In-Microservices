@@ -11,7 +11,7 @@ using Order.API.Data;
 namespace Order.API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241227162019_InitialCreate")]
+    [Migration("20241227200430_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -26,13 +26,16 @@ namespace Order.API.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Currency")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("CustomerEmail")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CustomerFullName")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Prudoct")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
