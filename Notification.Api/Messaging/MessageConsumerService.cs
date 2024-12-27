@@ -53,6 +53,7 @@ namespace Notification.Api.Messaging
                         await notificationService.CreateNotificationAsync(notification);
                     }
                     await channel.BasicAckAsync(args.DeliveryTag, false);
+                    Console.WriteLine(json);
                 }
                 else
                 {
