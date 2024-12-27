@@ -4,9 +4,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.6.33723.286
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RabbitmqDemoSample", "RabbitmqDemoSample", "{0E81BD95-7FD2-4939-8780-F28981942DBF}"
-	ProjectSection(SolutionItems) = preProject
-		README.txt = README.txt
-	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SenderMessage", "SenderMassege\SenderMessage.csproj", "{F8DDC791-C45B-49D0-BA2E-98A581EEABB6}"
 EndProject
@@ -20,7 +17,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sample", "Sample", "{559C2F
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Order.API", "Order.API\Order.API.csproj", "{5EF542F4-4ADF-444A-9A9E-F044E8EB829D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notification.Api", "Notification.Api\Notification.Api.csproj", "{6F208F71-E3E8-4AC1-88AC-425D481BCBF6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Notification.Api", "Notification.Api\Notification.Api.csproj", "{6F208F71-E3E8-4AC1-88AC-425D481BCBF6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
