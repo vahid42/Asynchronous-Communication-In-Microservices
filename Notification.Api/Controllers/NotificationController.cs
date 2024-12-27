@@ -30,7 +30,7 @@ namespace Notification.API.Controllers
             return Ok(_mapper.Map<IEnumerable<NotificationForReturnDto>>(notification));
         }
 
-        [HttpGet("notificationId}", Name = nameof(GetNotification))]
+        [HttpGet("{notificationId}", Name = nameof(GetNotification))]
         public async Task<IActionResult> GetNotification(Guid notificationId)
         {
             var notification = await _notificationService.GetNotificationByIdAsync(notificationId);
