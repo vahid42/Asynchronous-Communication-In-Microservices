@@ -47,7 +47,7 @@ namespace Notification.Api.Messaging
                         var notification = new API.Entities.Notification()
                         {
                             Email = notify.CustomerEmail,
-                            OrderDeatils = $"{notify.Id}-{notify.Amount}-{notify.Currency}",
+                            OrderDeatils = $"{notify.Id}-{notify.Price}-{notify.Prudoct}-{notify.CustomerFullName}",
                             SendDateTime = DateTime.Now
                         };
                         await notificationService.CreateNotificationAsync(notification);
