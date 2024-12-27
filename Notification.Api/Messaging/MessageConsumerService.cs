@@ -11,45 +11,50 @@ namespace Notification.Api.Messaging
 {
     public class MessageConsumerService : BackgroundService
     {
-        private readonly INotificationService notificationService;
+        private readonly IServiceProvider serviceProvider;
 
-        public MessageConsumerService(INotificationService notificationService)
+        public MessageConsumerService(IServiceProvider serviceProvider)
         {
-            this.notificationService = notificationService;
+            this.serviceProvider = serviceProvider;
         }
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            ConnectionFactory conFactory = new();
-            conFactory.Uri = new Uri(MessageConstant.url);
-            conFactory.ClientProvidedName = "Notification Api";
-            using IConnection connection = await conFactory.CreateConnectionAsync();
-            using IChannel channel = await connection.CreateChannelAsync();
-            await channel.ExchangeDeclareAsync(MessageConstant.ExchangeName, ExchangeType.Direct, cancellationToken: stoppingToken);
-            await channel.QueueDeclareAsync(MessageConstant.Queuename, false, false, false, null, cancellationToken: stoppingToken);
-            await channel.QueueBindAsync(MessageConstant.Queuename, MessageConstant.ExchangeName, MessageConstant.RoutingKey, null, cancellationToken: stoppingToken);
-            await channel.BasicQosAsync(0, 1, false, stoppingToken);
-
-            var consumer = new AsyncEventingBasicConsumer(channel);
-            consumer.ReceivedAsync += async (sender, args) =>
+            using (var scope = serviceProvider.CreateScope())
             {
-                var body = args.Body.ToArray();
-                string json = Encoding.UTF8.GetString(body);
+                var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
+                ConnectionFactory conFactory = new();
+                conFactory.Uri = new Uri(MessageConstant.url);
+                conFactory.ClientProvidedName = "Notification Api";
+                using IConnection connection = await conFactory.CreateConnectionAsync();
+                using IChannel channel = await connection.CreateChannelAsync();
+                await channel.ExchangeDeclareAsync(MessageConstant.ExchangeName, ExchangeType.Direct, cancellationToken: stoppingToken);
+                await channel.QueueDeclareAsync(MessageConstant.Queuename, false, false, false, null, cancellationToken: stoppingToken);
+                await channel.QueueBindAsync(MessageConstant.Queuename, MessageConstant.ExchangeName, MessageConstant.RoutingKey, null, cancellationToken: stoppingToken);
+                await channel.BasicQosAsync(0, 1, false, stoppingToken);
 
-                var notiy = JsonSerializer.Deserialize<GetOrderInQueueDto>(json);
-                if (notiy != null)
+                var consumer = new AsyncEventingBasicConsumer(channel);
+                consumer.ReceivedAsync += async (sender, args) =>
                 {
-                    var notification = new API.Entities.Notification()
+                    var body = args.Body.ToArray();
+                    string json = Encoding.UTF8.GetString(body);
+
+                    var notiy = JsonSerializer.Deserialize<GetOrderInQueueDto>(json);
+                    if (notiy != null)
                     {
-                        Email = notiy.CustomerEmail,
-                        OrderDeatils = notiy.Id + "-" + notiy.Amount + "-" + notiy.Currency,
-                        SendDateTime = DateTime.Now
-                    };
-                    await notificationService.CreateNotificationAsync(notification);
-                    await channel.BasicConsumeAsync(MessageConstant.Queuename, true, consumer);
-                }
+                        var notification = new API.Entities.Notification()
+                        {
+                            Email = notiy.CustomerEmail,
+                            OrderDeatils = notiy.Id + "-" + notiy.Amount + "-" + notiy.Currency,
+                            SendDateTime = DateTime.Now
+                        };
+                        await notificationService.CreateNotificationAsync(notification);
+                        await channel.BasicConsumeAsync(MessageConstant.Queuename, true, consumer);
+                    }
 
-            };
-
+                };
+            }
         }
+
     }
 }
+

@@ -18,7 +18,7 @@ namespace Order.API.Data
         {
             var folder = Environment.SpecialFolder.LocalApplicationData;
             var path = Environment.GetFolderPath(folder);
-            return System.IO.Path.Join(path, "Order.db");
+            return System.IO.Path.Join(path, "OrderDB.db");
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

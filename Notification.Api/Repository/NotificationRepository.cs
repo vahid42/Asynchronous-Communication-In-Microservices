@@ -23,7 +23,7 @@ namespace Notification.API.Repository
 
         public async Task<Entities.Notification?> GetNotificationByIdAsync(Guid notificationId)
         {
-           return await  context.Notifications.Where(c => c.Id == notificationId).FirstOrDefaultAsync();
+            return await context.Notifications.Where(c => c.Id == notificationId).FirstOrDefaultAsync();
         }
 
         public async Task<IEnumerable<Entities.Notification>> GetNotificationsAsync()

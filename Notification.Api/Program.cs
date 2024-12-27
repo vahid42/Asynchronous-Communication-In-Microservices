@@ -19,8 +19,10 @@ namespace Notification.Api
             builder.Services.AddSwaggerGen();
             builder.Services.AddAutoMapper(typeof(Program));
             builder.Services.AddDbContext<AppDbContext>();
+
             builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
             builder.Services.AddScoped<INotificationService, NotificationService>();
+
             builder.Services.AddHostedService<MessageConsumerService>();
 
             var app = builder.Build();
