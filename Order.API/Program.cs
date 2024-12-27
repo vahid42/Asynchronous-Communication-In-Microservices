@@ -1,6 +1,7 @@
 
 using Microsoft.Extensions.Options;
 using Order.API.Data;
+using Order.API.Messaging;
 using Order.API.Repository;
 using Order.API.Services;
 
@@ -25,6 +26,7 @@ namespace Order.API
 
             builder.Services.AddScoped<IOrderRepository, OrderRepository>();
             builder.Services.AddScoped<IOrderService, OrderService>();
+            builder.Services.AddSingleton<ISenderMessage, SenderMessage>();
           
 
             var app = builder.Build();

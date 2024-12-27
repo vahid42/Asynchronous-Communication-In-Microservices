@@ -1,6 +1,7 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Order.API.Dtos;
+using Order.API.Messaging;
 using Order.API.Services;
 
 namespace Order.API.Controllers
@@ -11,14 +12,16 @@ namespace Order.API.Controllers
     {
         private readonly IOrderService _ordersService;
         private readonly ILogger<OrderController> _logger;
+        private readonly ISenderMessage senderMessage;
         private readonly IMapper _mapper;
 
         public OrderController(IOrderService ordersService,
-            ILogger<OrderController> logger,
+            ILogger<OrderController> logger, ISenderMessage senderMessage
             IMapper mapper)
         {
             _ordersService = ordersService;
             _logger = logger;
+            this.senderMessage = senderMessage;
             _mapper = mapper;
         }
 
@@ -42,7 +45,7 @@ namespace Order.API.Controllers
         {
             var order = await _ordersService.CreateOrderAsync(_mapper.Map<Entities.Order>(orderForCreateDto));
             var orderDto = _mapper.Map<OrderForReturnDto>(order);
-
+            await senderMessage.SendMessage(order);
             return CreatedAtAction(nameof(GetOrder), new { orderId = order.Id }, new { orderDto });
         }
 
