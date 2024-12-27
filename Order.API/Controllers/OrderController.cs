@@ -16,7 +16,7 @@ namespace Order.API.Controllers
         private readonly IMapper _mapper;
 
         public OrderController(IOrderService ordersService,
-            ILogger<OrderController> logger, ISenderMessage senderMessage
+            ILogger<OrderController> logger, ISenderMessage senderMessage,
             IMapper mapper)
         {
             _ordersService = ordersService;

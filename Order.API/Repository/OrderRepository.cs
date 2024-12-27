@@ -37,7 +37,7 @@ namespace Order.API.Repository
 
         public async Task<Entities.Order?> GetOrderByIdAsync(Guid orderId)
         {
-           return await  context.Orders.Where(c => c.Id == orderId).FirstOrDefaultAsync();
+           return await context.Orders.Where(c => c.Id == orderId).FirstOrDefaultAsync();
         }
 
         public async Task<IEnumerable<Entities.Order>> GetOrdersAsync()
@@ -56,7 +56,7 @@ namespace Order.API.Repository
             catch (Exception)
             {
 
-                return null;
+                return new Entities.Order();
             }
            
         }

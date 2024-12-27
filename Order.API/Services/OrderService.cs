@@ -30,7 +30,10 @@ namespace Order.API.Services
 
         public async Task<Entities.Order> GetOrderByIdAsync(Guid orderId)
         {
-            return await repository.GetOrderByIdAsync(orderId);
+            var order = await repository.GetOrderByIdAsync(orderId);
+            if (order != null) return order;
+
+            return new Entities.Order();
         }
 
         public async Task<IEnumerable<Entities.Order>> GetOrdersAsync()
@@ -44,10 +47,10 @@ namespace Order.API.Services
             if (item != null)
             {
                 return await repository.UpdateOrderAsync(order);
-               
+
             }
 
-            return null;
+            return new Entities.Order();
         }
     }
 }
