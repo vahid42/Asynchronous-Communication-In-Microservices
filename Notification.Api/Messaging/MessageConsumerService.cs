@@ -12,49 +12,65 @@ namespace Notification.Api.Messaging
     public class MessageConsumerService : BackgroundService
     {
         private readonly IServiceProvider serviceProvider;
-
+        private IChannel channel;
+        private IConnection connection;
         public MessageConsumerService(IServiceProvider serviceProvider)
         {
             this.serviceProvider = serviceProvider;
         }
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            using (var scope = serviceProvider.CreateScope())
+            ConnectionFactory conFactory = new()
             {
-                var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
-                ConnectionFactory conFactory = new();
-                conFactory.Uri = new Uri(MessageConstant.url);
-                conFactory.ClientProvidedName = "Notification Api";
-                using IConnection connection = await conFactory.CreateConnectionAsync();
-                using IChannel channel = await connection.CreateChannelAsync();
-                await channel.ExchangeDeclareAsync(MessageConstant.ExchangeName, ExchangeType.Direct, cancellationToken: stoppingToken);
-                await channel.QueueDeclareAsync(MessageConstant.Queuename, false, false, false, null, cancellationToken: stoppingToken);
-                await channel.QueueBindAsync(MessageConstant.Queuename, MessageConstant.ExchangeName, MessageConstant.RoutingKey, null, cancellationToken: stoppingToken);
-                await channel.BasicQosAsync(0, 1, false, stoppingToken);
+                Uri = new Uri(MessageConstant.url),
+                ClientProvidedName = "Notification Api"
+            };
 
-                var consumer = new AsyncEventingBasicConsumer(channel);
-                consumer.ReceivedAsync += async (sender, args) =>
+            connection = await conFactory.CreateConnectionAsync();
+            channel = await connection.CreateChannelAsync();
+            await channel.ExchangeDeclareAsync(MessageConstant.ExchangeName, ExchangeType.Direct, cancellationToken: stoppingToken);
+            await channel.QueueDeclareAsync(MessageConstant.Queuename, false, false, false, null, cancellationToken: stoppingToken);
+            await channel.QueueBindAsync(MessageConstant.Queuename, MessageConstant.ExchangeName, MessageConstant.RoutingKey, null, cancellationToken: stoppingToken);
+            await channel.BasicQosAsync(0, 1, false, stoppingToken);
+
+            var consumer = new AsyncEventingBasicConsumer(channel);
+            consumer.ReceivedAsync += async (sender, args) =>
+            {
+                var body = args.Body.ToArray();
+                string json = Encoding.UTF8.GetString(body);
+                var notify = JsonSerializer.Deserialize<GetOrderInQueueDto>(json);
+                if (notify != null)
                 {
-                    var body = args.Body.ToArray();
-                    string json = Encoding.UTF8.GetString(body);
-
-                    var notiy = JsonSerializer.Deserialize<GetOrderInQueueDto>(json);
-                    if (notiy != null)
+                    using (var scope = serviceProvider.CreateScope())
                     {
+                        var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
                         var notification = new API.Entities.Notification()
                         {
-                            Email = notiy.CustomerEmail,
-                            OrderDeatils = notiy.Id + "-" + notiy.Amount + "-" + notiy.Currency,
+                            Email = notify.CustomerEmail,
+                            OrderDeatils = $"{notify.Id}-{notify.Amount}-{notify.Currency}",
                             SendDateTime = DateTime.Now
                         };
                         await notificationService.CreateNotificationAsync(notification);
-                        await channel.BasicConsumeAsync(MessageConstant.Queuename, true, consumer);
                     }
+                    await channel.BasicAckAsync(args.DeliveryTag, false);
+                }
+                else
+                {
+                    await channel.BasicNackAsync(args.DeliveryTag, false, false); // Reject message without requeue  
+                }
+            };
 
-                };
-            }
+            // Start consuming messages  
+            await channel.BasicConsumeAsync(queue: MessageConstant.Queuename, autoAck: false, consumer: consumer);
         }
 
+
+        public override void Dispose()
+        {
+            base.Dispose();
+            channel.Dispose();
+            connection.Dispose();
+        }
     }
 }
 
